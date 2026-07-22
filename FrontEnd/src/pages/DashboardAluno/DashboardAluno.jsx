@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardHeader from "./Components/DashboardHeader.jsx";
 import CalendarCard from "./Components/CalendarCard.jsx";
 import DashboardSidebar from "./Components/DashboardSidebar.jsx";
+import EnrollmentModal from "./Components/EnrollmentModal.jsx";
 import { apiFetch } from "../../api/api.js";
 
 import "./dashboardAluno.css";
@@ -186,6 +187,14 @@ function DashboardAluno() {
   const [carregandoDashboard, setCarregandoDashboard] = useState(true);
 
   const [erro, setErro] = useState("");
+
+  const [modalMatriculasAberto, setModalMatriculasAberto] = useState(false);
+  const [materiasDisponiveis, setMateriasDisponiveis] = useState([]);
+  const [carregandoDisponiveis, setCarregandoDisponiveis] = useState(false);
+  const [erroMatricula, setErroMatricula] = useState("");
+  const [matriculandoId, setMatriculandoId] = useState(null);
+  const [removendoMateriaId, setRemovendoMateriaId] = useState(null);
+  const [erroDesmatricula, setErroDesmatricula] = useState("");
 
   //Guarda o dia atual.
   const hoje = useMemo(() => {
@@ -386,6 +395,81 @@ function DashboardAluno() {
     });
   }
 
+  async function abrirMatriculas() {
+    setModalMatriculasAberto(true);
+    setCarregandoDisponiveis(true);
+    setErroMatricula("");
+
+    try {
+      const resposta = await apiFetch("/materias");
+      const idsMatriculados = new Set(
+        materias.map((materia) => String(materia.materia_id)),
+      );
+
+      setMateriasDisponiveis(
+        extrairLista(resposta).filter(
+          (materia) => !idsMatriculados.has(String(materia.id)),
+        ),
+      );
+    } catch (error) {
+      setErroMatricula(error.message || "Não foi possível carregar as matérias.");
+    } finally {
+      setCarregandoDisponiveis(false);
+    }
+  }
+
+  async function matricularNaMateria(materia) {
+    setMatriculandoId(materia.id);
+    setErroMatricula("");
+
+    try {
+      await apiFetch("/aluno_materia", {
+        method: "POST",
+        body: JSON.stringify({ materia_id: materia.id }),
+      });
+
+      const [respostaAtualizada, atividadesAtualizadas] = await Promise.all([
+        apiFetch("/aluno_materia/minhas"),
+        apiFetch("/atividades"),
+      ]);
+      
+      setMaterias(extrairLista(respostaAtualizada));
+      setAtividades(extrairLista(atividadesAtualizadas));
+      setMateriasDisponiveis((atuais) =>
+        atuais.filter((item) => item.id !== materia.id),
+      );
+    } catch (error) {
+      setErroMatricula(error.message || "Não foi possível fazer a matrícula.");
+    } finally {
+      setMatriculandoId(null);
+    }
+  }
+
+  async function desmatricularDaMateria(materia) {
+    setRemovendoMateriaId(materia.materia_id);
+    setErroDesmatricula("");
+
+    try {
+      await apiFetch(`/aluno_materia/${materia.materia_id}`, {
+        method: "DELETE",
+      });
+
+      const [materiasAtualizadas, atividadesAtualizadas] = await Promise.all([
+        apiFetch("/aluno_materia/minhas"),
+        apiFetch("/atividades"),
+      ]);
+
+      setMaterias(extrairLista(materiasAtualizadas));
+      setAtividades(extrairLista(atividadesAtualizadas));
+    } catch (error) {
+      setErroDesmatricula(
+        error.message || "Não foi possível cancelar a matrícula.",
+      );
+    } finally {
+      setRemovendoMateriaId(null);
+    }
+  }
+
   /*
     Faz logout no backend e volta para a página inicial.
   */
@@ -454,8 +538,23 @@ function DashboardAluno() {
           erro={erro}
           nomesMeses={nomesMeses}
           formatarHorario={formatarHorario}
+          onAbrirMatriculas={abrirMatriculas}
+          removendoMateriaId={removendoMateriaId}
+          erroDesmatricula={erroDesmatricula}
+          onDesmatricular={desmatricularDaMateria}
         />
       </section>
+
+      {modalMatriculasAberto && (
+        <EnrollmentModal
+          materias={materiasDisponiveis}
+          carregando={carregandoDisponiveis}
+          erro={erroMatricula}
+          matriculandoId={matriculandoId}
+          onMatricular={matricularNaMateria}
+          onFechar={() => setModalMatriculasAberto(false)}
+        />
+      )}
     </main>
   );
 }

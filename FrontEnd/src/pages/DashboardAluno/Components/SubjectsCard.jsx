@@ -1,6 +1,4 @@
-import { Link } from "react-router-dom";
-
-function SubjectsCard({ materias, carregando }) {
+function SubjectsCard({ materias, carregando, removendoId, erro, onDesmatricular }) {
   return (
     <section className="dashboard-card side-card">
       <div className="card-heading-row">
@@ -10,10 +8,12 @@ function SubjectsCard({ materias, carregando }) {
         </h2>
       </div>
 
+      {erro && <p className="error-message">{erro}</p>}
+
       {carregando ? (<p className="status-text">Carregando matérias...</p>) : materias.length > 0 ? (
         <div className="subject-list">
           {materias.map((materia, index) => (
-            <Link
+            <article
               className="subject-item"
               key={materia.materia_id ?? `${materia.materia_nome}-${index}`}
             >
@@ -32,7 +32,15 @@ function SubjectsCard({ materias, carregando }) {
                 </small>
               </span>
 
-            </Link>
+              <button
+                type="button"
+                className="unenroll-button"
+                onClick={() => onDesmatricular(materia)}
+                disabled={removendoId !== null}
+              >
+                {removendoId === materia.materia_id ? "…" : "×"}
+              </button>
+            </article>
           ))}
         </div>
       ) : (

@@ -9,14 +9,21 @@ function DashboardSidebar({
   erro,
   nomesMeses,
   formatarHorario,
+  onAbrirMatriculas,
+  removendoMateriaId,
+  erroDesmatricula,
+  onDesmatricular,
 }) {
   return (
     <aside className="dashboard-sidebar">
-      <QuickActionsCard />
+      <QuickActionsCard onAbrirMatriculas={onAbrirMatriculas} />
 
       <SubjectsCard
         materias={materias}
         carregando={carregando}
+        removendoId={removendoMateriaId}
+        erro={erroDesmatricula}
+        onDesmatricular={onDesmatricular}
       />
 
       <AppointmentsCard

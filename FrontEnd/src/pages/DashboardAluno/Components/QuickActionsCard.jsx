@@ -1,6 +1,4 @@
-import { Link } from "react-router-dom";
-
-function QuickActionsCard() {
+function QuickActionsCard({ onAbrirMatriculas }) {
   return (
     <section className="dashboard-card side-card">
       <h2>
@@ -9,11 +7,11 @@ function QuickActionsCard() {
       </h2>
 
       <div className="quick-actions">
-        <Link to="/materias" className="quick-action">
+        <button type="button" className="quick-action" onClick={onAbrirMatriculas}>
           <span className="action-icon blue-icon">🎓</span>
           <strong>Cadastrar em matéria</strong>
           <span>›</span>
-        </Link>
+        </button>
       </div>
     </section>
   );
