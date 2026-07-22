@@ -80,6 +80,22 @@ alunoMateriaRoutes.get('/materia/:id', autenticar, async (req, res) => {
     }
 });
 
+alunoMateriaRoutes.get('/minhas', autenticar, autorizarRoles("ALUNO"), async (req, res) => {
+        try {
+            const matricula = req.usuario.matricula;
+
+            const materias = await repository.listarMateriasDoAluno(matricula);
+            return res.status(200).json(materias);
+        } catch (err) {
+            console.log(`Erro ao listar matérias do aluno: ${err}`);
+
+            return res.status(500).json({
+                mensagem: "Erro ao buscar matérias do aluno"
+            });
+        }
+    }
+);
+
 alunoMateriaRoutes.post('/', autenticar, autorizarRoles("ALUNO", "ADMINISTRADOR"), async (req, res) => {
 
     try {

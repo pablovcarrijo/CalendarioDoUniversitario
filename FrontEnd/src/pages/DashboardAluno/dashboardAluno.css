@@ -548,6 +548,7 @@ a {
 
   background-color: #d3b2ff;
   transform: scale(1.07);
+  border-radius: 5px;
 }
 
 .calendar-day:focus-visible {

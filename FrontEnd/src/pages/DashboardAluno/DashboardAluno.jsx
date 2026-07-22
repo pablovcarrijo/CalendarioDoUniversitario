@@ -4,11 +4,6 @@ import { useNavigate } from "react-router-dom";
 import DashboardHeader from "./Components/DashboardHeader.jsx";
 import CalendarCard from "./Components/CalendarCard.jsx";
 import DashboardSidebar from "./Components/DashboardSidebar.jsx";
-
-/*
-  Ajuste este caminho conforme a localização do seu apiFetch.
-  Também confira se ele foi exportado como default ou export nomeado.
-*/
 import { apiFetch } from "../../api/api.js";
 
 import "./dashboardAluno.css";
@@ -284,9 +279,8 @@ function DashboardAluno() {
       try {
         setCarregandoDashboard(true);
         setErro("");
-
         const [respostaMaterias, respostaAtividades] = await Promise.all([
-          apiFetch("/materias"),
+          apiFetch("/aluno_materia/minhas"),
           apiFetch("/atividades"),
         ]);
 

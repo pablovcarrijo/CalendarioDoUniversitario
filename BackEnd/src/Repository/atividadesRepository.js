@@ -22,6 +22,41 @@ export class AtividadesRepository {
 
     }
 
+    async listarAtividadesDoAluno(alunoMatricula, materiaId = null) {
+        let sql = `
+        SELECT
+            atividade.id,
+            atividade.titulo,
+            atividade.descricao,
+            atividade.data_entrega,
+            materia.nome,
+            atividade.materia_id,
+            atividade.criado_em
+        FROM atividade
+
+        INNER JOIN materia
+            ON materia.id = atividade.materia_id
+
+        INNER JOIN aluno_materia
+            ON aluno_materia.materia_id = materia.id
+
+        WHERE aluno_materia.aluno_matricula = ?
+    `;
+
+        const parametros = [alunoMatricula];
+
+        if (materiaId) {
+            sql += ` AND materia.id = ?`;
+            parametros.push(materiaId);
+        }
+
+        sql += ` ORDER BY atividade.data_entrega ASC`;
+
+        const [atividades] = await pool.query(sql, parametros);
+
+        return atividades;
+    }
+
     async listarAtividadePorMateria(materiaId) {
         const [atividades] = await pool.query(`
             SELECT

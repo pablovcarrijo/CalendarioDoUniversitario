@@ -10,29 +10,45 @@ const repository = new AtividadesRepository();
 const repositorioMateria = new MateriasRepository();
 
 atividadeRoutes.get('/', autenticar, async (req, res) => {
-
     try {
+        const { materia } = req.query;
 
-        const { materia } = req.query
+        if (req.usuario.role === "ALUNO") {
+            const resultado =
+                await repository.listarAtividadesDoAluno(
+                    req.usuario.matricula,
+                    materia
+                );
+
+            return res.status(200).json({
+                resultado
+            });
+        }
 
         if (materia) {
-            const resultado = await repository.listarAtividadePorMateria(materia);
+            const resultado =
+                await repository.listarAtividadePorMateria(materia);
+
             return res.status(200).json({
                 materia,
                 resultado
-            })
+            });
         }
 
-        const resultado = await repository.listarAtividades();
+        const resultado =
+            await repository.listarAtividades();
+
         return res.status(200).json({
             resultado
-        })
+        });
+    } catch (err) {
+        console.log(`Erro ao listar atividades: ${err}`);
+
+        return res.status(500).json({
+            mensagem: "Erro ao encontrar atividades"
+        });
     }
-    catch (err) {
-        console.log(`Erro: ${err}`);
-        return res.status(500).json({ mensagem: "Erro ao encontrar resultado" });
-    }
-})
+});
 
 atividadeRoutes.post('/', autenticar, autorizarRoles("PROFESSOR", "ADMINISTRADOR"), async (req, res) => {
     try {

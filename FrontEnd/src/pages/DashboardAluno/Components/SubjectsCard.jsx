@@ -15,16 +15,16 @@ function SubjectsCard({ materias, carregando }) {
           {materias.map((materia, index) => (
             <Link
               className="subject-item"
-              key={materia.id ?? `${materia.nome}-${index}`}
+              key={materia.materia_id ?? `${materia.materia_nome}-${index}`}
             >
               <span
                 className={`subject-icon subject-color-${index % 4}`}
               >
-                {materia.nome?.charAt(0)?.toUpperCase()}
+                {materia.materia_nome?.charAt(0)?.toUpperCase()}
               </span>
 
               <span>
-                <strong>{materia.nome}</strong>
+                <strong>{materia.materia_nome}</strong>
 
                 <small>
                   {materia.professor_nome ||
