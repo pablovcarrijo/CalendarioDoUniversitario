@@ -4,12 +4,11 @@ function formatarData(valor) {
   if (!valor) return "Data não informada";
   const data = new Date(valor);
   if (Number.isNaN(data.getTime())) return valor;
-  return data.toLocaleString("pt-BR", {
+  return data.toLocaleDateString("pt-BR", {
+    timeZone: "UTC",
     day: "2-digit",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 }
 
@@ -20,11 +19,15 @@ function SubjectCard({
   formularioAberto,
   novaAtividade,
   salvando,
+  excluindoAtividadeId,
+  excluindoMateria,
   onAlternar,
   onAbrirFormulario,
   onAlterarAtividade,
   onSalvarAtividade,
   onCancelarAtividade,
+  onExcluirAtividade,
+  onExcluirMateria,
 }) {
   return (
     <article className="professor-subject-card">
@@ -46,6 +49,16 @@ function SubjectCard({
           {atividades.length === 1 ? "atividade" : "atividades"}
         </span>
         <span className="expand-icon">{aberta ? "⌃" : "⌄"}</span>
+      </button>
+      <button
+        type="button"
+        className="delete-subject-button"
+        onClick={onExcluirMateria}
+        disabled={excluindoMateria}
+        aria-label={`Excluir matéria ${materia.nome}`}
+        title="Excluir matéria"
+      >
+        {excluindoMateria ? "…" : "×"}
       </button>
 
       {aberta && (
@@ -79,6 +92,16 @@ function SubjectCard({
                     <p>{atividade.descricao || "Sem descrição"}</p>
                   </div>
                   <time>{formatarData(atividade.data_entrega)}</time>
+                  <button
+                    type="button"
+                    className="delete-activity-button"
+                    onClick={() => onExcluirAtividade(atividade)}
+                    disabled={excluindoAtividadeId === atividade.id}
+                    aria-label={`Excluir atividade ${atividade.titulo}`}
+                    title="Excluir atividade"
+                  >
+                    {excluindoAtividadeId === atividade.id ? "…" : "×"}
+                  </button>
                 </article>
               ))}
             </div>

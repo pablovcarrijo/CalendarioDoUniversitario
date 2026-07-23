@@ -1,68 +1,59 @@
-import pool from '../Config/db.js'
+import prisma from '../Config/db.js';
 
 export class AlunoMateriaRepository {
-
     async listarMateriasDoAluno(aluno_matricula) {
-        const [materias] = await pool.query(`
-            SELECT
-                aluno_materia.id AS vinculo_id,
+        const vinculos = await prisma.aluno_materia.findMany({
+            where: { aluno_matricula },
+            include: {
+                usuario: { select: { id: true, nome: true, matricula: true } },
+                materia: {
+                    include: { usuario: { select: { nome: true } } }
+                }
+            }
+        });
 
-                aluno.id AS aluno_id,
-                aluno.nome AS aluno_nome,
-                aluno.matricula AS aluno_matricula,
-
-                materia.id AS materia_id,
-                materia.nome AS materia_nome,
-                materia.descricao,
-                materia.professor_id,
-
-                professor.nome AS professor_nome
-            FROM aluno_materia
-            INNER JOIN usuario AS aluno 
-                ON aluno.matricula = aluno_materia.aluno_matricula
-            INNER JOIN materia 
-                ON materia.id = aluno_materia.materia_id
-            INNER JOIN usuario AS professor 
-                ON professor.id = materia.professor_id
-            WHERE aluno_materia.aluno_matricula = ?
-        `, [aluno_matricula]);
-
-        return materias;
+        return vinculos.map((vinculo) => ({
+            vinculo_id: vinculo.id,
+            aluno_id: vinculo.usuario.id,
+            aluno_nome: vinculo.usuario.nome,
+            aluno_matricula: vinculo.usuario.matricula,
+            materia_id: vinculo.materia.id,
+            materia_nome: vinculo.materia.nome,
+            descricao: vinculo.materia.descricao,
+            professor_id: vinculo.materia.professor_id,
+            professor_nome: vinculo.materia.usuario.nome
+        }));
     }
 
     async listarAlunosDaMateria(materia_id) {
-        const [alunos] = await pool.query(`
-            SELECT
-                aluno_materia.id AS vinculo_id,
-                usuario.id AS aluno_id,
-                usuario.nome,
-                usuario.email,
-                usuario.matricula,
-                usuario.role
-            FROM aluno_materia
-            INNER JOIN usuario ON usuario.matricula = aluno_materia.aluno_matricula
-            WHERE aluno_materia.materia_id = ?
-        `, [materia_id]);
+        const vinculos = await prisma.aluno_materia.findMany({
+            where: { materia_id: Number(materia_id) },
+            include: {
+                usuario: { select: { id: true, nome: true, email: true, matricula: true, role: true } }
+            }
+        });
 
-        return alunos;
+        return vinculos.map((vinculo) => ({
+            vinculo_id: vinculo.id,
+            aluno_id: vinculo.usuario.id,
+            nome: vinculo.usuario.nome,
+            email: vinculo.usuario.email,
+            matricula: vinculo.usuario.matricula,
+            role: vinculo.usuario.role
+        }));
     }
 
     async adicionarAlunoMateria(matricula, materia_id) {
-
-        const [aluno_materia] = await pool.query(
-            `INSERT INTO aluno_materia (aluno_matricula, materia_id)
-            values (?, ?)`, [matricula, materia_id]
-        );
-        return aluno_materia;
-
+        const vinculo = await prisma.aluno_materia.create({
+            data: { aluno_matricula: matricula, materia_id: Number(materia_id) }
+        });
+        return { insertId: vinculo.id, affectedRows: 1 };
     }
 
     async deletarAlunoMateria(matricula, materia_id) {
-        const [aluno_materia] = await pool.query(
-            `DELETE FROM aluno_materia
-            WHERE aluno_matricula = ? AND materia_id = ?`, [matricula, materia_id]
-        );
-        return aluno_materia;
+        const resultado = await prisma.aluno_materia.deleteMany({
+            where: { aluno_matricula: matricula, materia_id: Number(materia_id) }
+        });
+        return { affectedRows: resultado.count };
     }
-
 }

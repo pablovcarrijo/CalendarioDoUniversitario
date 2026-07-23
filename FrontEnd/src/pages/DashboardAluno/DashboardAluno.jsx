@@ -86,35 +86,24 @@ function normalizarData(valor) {
 
   const valorLimpo = valor.trim();
 
-  const formatoBanco = valorLimpo.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/,
-  );
+  const formatoBanco = valorLimpo.match(/^(\d{4})-(\d{2})-(\d{2})/);
 
   if (formatoBanco) {
     const ano = Number(formatoBanco[1]);
     const mes = Number(formatoBanco[2]) - 1;
     const dia = Number(formatoBanco[3]);
-    const hora = Number(formatoBanco[4] || 0);
-    const minuto = Number(formatoBanco[5] || 0);
-    const segundo = Number(formatoBanco[6] || 0);
-
-    const data = new Date(ano, mes, dia, hora, minuto, segundo);
+    const data = new Date(ano, mes, dia);
 
     return Number.isNaN(data.getTime()) ? null : data;
   }
 
-  const formatoBrasileiro = valorLimpo.match(
-    /^(\d{2})\/(\d{2})\/(\d{4})(?:\s(\d{2}):(\d{2}))?$/,
-  );
+  const formatoBrasileiro = valorLimpo.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
 
   if (formatoBrasileiro) {
     const dia = Number(formatoBrasileiro[1]);
     const mes = Number(formatoBrasileiro[2]) - 1;
     const ano = Number(formatoBrasileiro[3]);
-    const hora = Number(formatoBrasileiro[4] || 0);
-    const minuto = Number(formatoBrasileiro[5] || 0);
-
-    const data = new Date(ano, mes, dia, hora, minuto);
+    const data = new Date(ano, mes, dia);
 
     return Number.isNaN(data.getTime()) ? null : data;
   }
@@ -159,18 +148,6 @@ function criarDiasDoCalendario(ano, mes) {
   });
 }
 
-// Exibe a hora no formato pt-BR
-function formatarHorario(data) {
-  if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
-    return "Horário não informado";
-  }
-
-  return data.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function DashboardAluno() {
   const navigate = useNavigate();
 
@@ -201,7 +178,7 @@ function DashboardAluno() {
     return new Date();
   }, []);
 
-  //Cria a data de hoje com horário 00:00:00.
+  // Cria uma data representando o início do dia atual.
   const inicioHoje = useMemo(() => {
     return new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
   }, [hoje]);
@@ -539,7 +516,6 @@ function DashboardAluno() {
           carregando={carregandoDashboard}
           erro={erro}
           nomesMeses={nomesMeses}
-          formatarHorario={formatarHorario}
           onAbrirMatriculas={abrirMatriculas}
           removendoMateriaId={removendoMateriaId}
           erroDesmatricula={erroDesmatricula}

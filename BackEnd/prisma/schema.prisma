@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+model aluno_materia {
+  id              Int      @id @default(autoincrement())
+  aluno_matricula String   @db.VarChar(100)
+  materia_id      Int
+  inscrito_em     DateTime @default(now()) @db.Timestamp(0)
+  usuario         usuario  @relation(fields: [aluno_matricula], references: [matricula], onDelete: Cascade, map: "fk_aluno_materia_aluno")
+  materia         materia  @relation(fields: [materia_id], references: [id], onDelete: Cascade, map: "fk_aluno_materia_materia")
+
+  @@unique([aluno_matricula, materia_id], map: "aluno_matricula")
+  @@index([materia_id], map: "materia_id")
+}
+
+model atividade {
+  id           Int      @id @default(autoincrement())
+  titulo       String   @db.VarChar(100)
+  descricao    String?  @db.VarChar(255)
+  data_entrega DateTime @db.Date
+  materia_id   Int
+  criado_em    DateTime @default(now()) @db.Timestamp(0)
+  materia      materia  @relation(fields: [materia_id], references: [id], onDelete: Cascade, map: "fk_atividade_materia")
+
+  @@index([materia_id], map: "materia_id")
+}
+
+model materia {
+  id            Int             @id @default(autoincrement())
+  nome          String          @db.VarChar(100)
+  descricao     String?         @db.VarChar(240)
+  professor_id  Int
+  criado_em     DateTime        @default(now()) @db.Timestamp(0)
+  aluno_materia aluno_materia[]
+  atividade     atividade[]
+  usuario       usuario         @relation(fields: [professor_id], references: [id], onDelete: Cascade, map: "fk_materia_professor")
+
+  @@index([professor_id], map: "professor_id")
+}
+
+model usuario {
+  id            Int             @id @default(autoincrement())
+  nome          String          @db.VarChar(100)
+  email         String          @unique(map: "email") @db.VarChar(100)
+  matricula     String          @unique(map: "matricula") @db.VarChar(100)
+  senha         String          @db.VarChar(255)
+  role          usuario_role
+  criado_em     DateTime        @default(now()) @db.Timestamp(0)
+  aluno_materia aluno_materia[]
+  materia       materia[]
+}
+
+enum usuario_role {
+  ALUNO
+  PROFESSOR
+  ADMINISTRADOR
+}

@@ -7,12 +7,16 @@ function ProfessorSubjects({
   formularioAtividade,
   novaAtividade,
   salvandoAtividadeId,
+  excluindoAtividadeId,
+  excluindoMateriaId,
   onCadastrarPrimeira,
   onAlternarMateria,
   onAbrirFormulario,
   onAlterarAtividade,
   onSalvarAtividade,
   onCancelarAtividade,
+  onExcluirAtividade,
+  onExcluirMateria,
 }) {
   if (materias.length === 0) {
     return (
@@ -48,11 +52,17 @@ function ProfessorSubjects({
           formularioAberto={formularioAtividade === materia.id}
           novaAtividade={novaAtividade}
           salvando={salvandoAtividadeId === materia.id}
+          excluindoAtividadeId={excluindoAtividadeId}
+          excluindoMateria={excluindoMateriaId === materia.id}
           onAlternar={() => onAlternarMateria(materia.id)}
           onAbrirFormulario={() => onAbrirFormulario(materia.id)}
           onAlterarAtividade={onAlterarAtividade}
           onSalvarAtividade={(event) => onSalvarAtividade(event, materia.id)}
           onCancelarAtividade={onCancelarAtividade}
+          onExcluirAtividade={(atividade) =>
+            onExcluirAtividade(atividade, materia.id)
+          }
+          onExcluirMateria={() => onExcluirMateria(materia)}
         />
       ))}
     </section>

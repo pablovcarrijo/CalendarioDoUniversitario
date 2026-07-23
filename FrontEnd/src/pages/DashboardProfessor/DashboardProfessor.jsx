@@ -30,6 +30,8 @@ function DashboardProfessor() {
   const [erro, setErro] = useState("");
   const [salvandoMateria, setSalvandoMateria] = useState(false);
   const [salvandoAtividadeId, setSalvandoAtividadeId] = useState(null);
+  const [excluindoAtividadeId, setExcluindoAtividadeId] = useState(null);
+  const [excluindoMateriaId, setExcluindoMateriaId] = useState(null);
   const [novaMateria, setNovaMateria] = useState({ nome: "", descricao: "" });
   const [novaAtividade, setNovaAtividade] = useState({
     titulo: "",
@@ -117,7 +119,11 @@ function DashboardProfessor() {
   function abrirFormularioAtividade(materiaId) {
     setMateriaAberta(materiaId);
     setFormularioAtividade((atual) => (atual === materiaId ? null : materiaId));
-    setNovaAtividade({ titulo: "", descricao: "", data_entrega: "" });
+    setNovaAtividade({
+      titulo: "",
+      descricao: "",
+      data_entrega: "",
+    });
     setErro("");
   }
 
@@ -135,12 +141,68 @@ function DashboardProfessor() {
         ...atuais,
         [materiaId]: extrairLista(resposta),
       }));
-      setNovaAtividade({ titulo: "", descricao: "", data_entrega: "" });
+      setNovaAtividade({
+        titulo: "",
+        descricao: "",
+        data_entrega: "",
+      });
       setFormularioAtividade(null);
     } catch (error) {
       setErro(error.message || "Não foi possível cadastrar a atividade.");
     } finally {
       setSalvandoAtividadeId(null);
+    }
+  }
+
+  async function excluirAtividade(atividade, materiaId) {
+    const confirmou = window.confirm(
+      `Tem certeza que deseja excluir a atividade "${atividade.titulo}"?`,
+    );
+    if (!confirmou) return;
+
+    setExcluindoAtividadeId(atividade.id);
+    setErro("");
+    try {
+      await apiFetch(`/atividades/${atividade.id}`, { method: "DELETE" });
+      setAtividadesPorMateria((atuais) => ({
+        ...atuais,
+        [materiaId]: (atuais[materiaId] || []).filter(
+          (item) => item.id !== atividade.id,
+        ),
+      }));
+    } catch (error) {
+      setErro(error.message || "Não foi possível excluir a atividade.");
+    } finally {
+      setExcluindoAtividadeId(null);
+    }
+  }
+
+  async function excluirMateria(materia) {
+    const confirmou = window.confirm(
+      `Tem certeza que deseja excluir a matéria "${materia.nome}"? Todas as atividades e inscrições vinculadas também serão excluídas.`,
+    );
+    if (!confirmou) return;
+
+    setExcluindoMateriaId(materia.id);
+    setErro("");
+    try {
+      await apiFetch(`/materias/${materia.id}`, { method: "DELETE" });
+      setMaterias((atuais) =>
+        atuais.filter((item) => item.id !== materia.id),
+      );
+      setAtividadesPorMateria((atuais) => {
+        const atualizadas = { ...atuais };
+        delete atualizadas[materia.id];
+        return atualizadas;
+      });
+      setMateriaAberta((atual) => (atual === materia.id ? null : atual));
+      setFormularioAtividade((atual) =>
+        atual === materia.id ? null : atual,
+      );
+    } catch (error) {
+      setErro(error.message || "Não foi possível excluir a matéria.");
+    } finally {
+      setExcluindoMateriaId(null);
     }
   }
 
@@ -176,6 +238,8 @@ function DashboardProfessor() {
             formularioAtividade={formularioAtividade}
             novaAtividade={novaAtividade}
             salvandoAtividadeId={salvandoAtividadeId}
+            excluindoAtividadeId={excluindoAtividadeId}
+            excluindoMateriaId={excluindoMateriaId}
             onCadastrarPrimeira={() => setAbaAtiva("nova")}
             onAlternarMateria={(id) =>
               setMateriaAberta((atual) => (atual === id ? null : id))
@@ -184,6 +248,8 @@ function DashboardProfessor() {
             onAlterarAtividade={setNovaAtividade}
             onSalvarAtividade={cadastrarAtividade}
             onCancelarAtividade={() => setFormularioAtividade(null)}
+            onExcluirAtividade={excluirAtividade}
+            onExcluirMateria={excluirMateria}
           />
         )}
       </section>

@@ -118,6 +118,16 @@ materiasRoutes.put("/:id", autenticar, autorizarRoles("PROFESSOR", "ADMINISTRADO
 materiasRoutes.delete("/:id", autenticar, autorizarRoles("PROFESSOR", "ADMINISTRADOR"), async (req, res) => {
     try{
         const idDelete = req.params.id;
+        const materia = await repository.listarMateriaById(idDelete);
+
+        if (materia.length === 0) {
+            return res.status(404).json({mensagem: "Erro, matéria não encontrada"});
+        }
+
+        if (req.usuario.role !== "ADMINISTRADOR" &&
+            String(materia[0].professor_id) !== String(req.usuario.id)) {
+            return res.status(403).json({mensagem: "Você só pode excluir suas próprias matérias"});
+        }
 
         const resultado = await repository.deletarMateria(idDelete);
 

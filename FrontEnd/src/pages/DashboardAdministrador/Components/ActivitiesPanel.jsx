@@ -71,7 +71,7 @@ function ActivitiesPanel({
           </select>
           <input
             required
-            type="datetime-local"
+            type="date"
             value={form.data_entrega}
             onChange={(e) => setForm({ ...form, data_entrega: e.target.value })}
           />
@@ -122,7 +122,10 @@ function ActivitiesPanel({
               <h3>{a.titulo}</h3>
               <p>{a.descricao || "Sem descrição"}</p>
               <small>
-                {a.nome} · {new Date(a.data_entrega).toLocaleString("pt-BR")}
+                {a.nome} ·{" "}
+                {new Date(a.data_entrega).toLocaleDateString("pt-BR", {
+                  timeZone: "UTC",
+                })}
               </small>
             </div>
             <button

@@ -8,7 +8,6 @@ function DashboardSidebar({
   carregando,
   erro,
   nomesMeses,
-  formatarHorario,
   onAbrirMatriculas,
   removendoMateriaId,
   erroDesmatricula,
@@ -31,7 +30,6 @@ function DashboardSidebar({
         carregando={carregando}
         erro={erro}
         nomesMeses={nomesMeses}
-        formatarHorario={formatarHorario}
       />
     </aside>
   );

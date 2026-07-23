@@ -5,7 +5,6 @@ function AppointmentsCard({
   carregando,
   erro,
   nomesMeses,
-  formatarHorario,
 }) {
   return (
     <section className="dashboard-card side-card appointments-card">
@@ -47,8 +46,7 @@ function AppointmentsCard({
               <strong>{atividade.titulo}</strong>
 
               <span>
-                {atividade.nome || "Atividade"} •{" "}
-                {formatarHorario(atividade.dataFormatada)}
+                {atividade.nome || "Atividade"}
               </span>
             </div>
           </Link>

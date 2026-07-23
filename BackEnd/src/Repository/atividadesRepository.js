@@ -1,132 +1,81 @@
-import pool from '../Config/db.js';
+import prisma from '../Config/db.js';
+
+const formatarAtividade = (atividade, materiaNome = 'nome') => ({
+    id: atividade.id,
+    titulo: atividade.titulo,
+    descricao: atividade.descricao,
+    data_entrega: atividade.data_entrega,
+    [materiaNome]: atividade.materia.nome,
+    materia_id: atividade.materia_id,
+    criado_em: atividade.criado_em
+});
+
+const comMateria = { materia: { select: { nome: true } } };
 
 export class AtividadesRepository {
-
     async listarAtividades() {
-
-        const [atividades] = await pool.query(`
-            
-            SELECT 
-                atividade.id,
-                atividade.titulo,
-                atividade.descricao,
-                atividade.data_entrega,
-                materia.nome,
-                atividade.materia_id,
-                atividade.criado_em
-            FROM atividade
-            INNER JOIN materia ON materia.id = atividade.materia_id            
-        `);
-
-        return atividades;
-
+        const atividades = await prisma.atividade.findMany({ include: comMateria });
+        return atividades.map((atividade) => formatarAtividade(atividade));
     }
 
     async listarAtividadesDoAluno(alunoMatricula, materiaId = null) {
-        let sql = `
-        SELECT
-            atividade.id,
-            atividade.titulo,
-            atividade.descricao,
-            atividade.data_entrega,
-            materia.nome,
-            atividade.materia_id,
-            atividade.criado_em
-        FROM atividade
-
-        INNER JOIN materia
-            ON materia.id = atividade.materia_id
-
-        INNER JOIN aluno_materia
-            ON aluno_materia.materia_id = materia.id
-
-        WHERE aluno_materia.aluno_matricula = ?
-    `;
-
-        const parametros = [alunoMatricula];
-
-        if (materiaId) {
-            sql += ` AND materia.id = ?`;
-            parametros.push(materiaId);
-        }
-
-        sql += ` ORDER BY atividade.data_entrega ASC`;
-
-        const [atividades] = await pool.query(sql, parametros);
-
-        return atividades;
+        const atividades = await prisma.atividade.findMany({
+            where: {
+                ...(materiaId ? { materia_id: Number(materiaId) } : {}),
+                materia: { aluno_materia: { some: { aluno_matricula: alunoMatricula } } }
+            },
+            include: comMateria,
+            orderBy: { data_entrega: 'asc' }
+        });
+        return atividades.map((atividade) => formatarAtividade(atividade));
     }
 
     async listarAtividadePorMateria(materiaId) {
-        const [atividades] = await pool.query(`
-            SELECT
-                atividade.id,
-                atividade.titulo,
-                atividade.descricao,
-                atividade.data_entrega,
-                materia.nome,
-                atividade.materia_id,
-                atividade.criado_em
-            FROM atividade
-            INNER JOIN materia ON materia.id = atividade.materia_id
-            WHERE materia.id = ?`, [materiaId]);
-
-        return atividades;
+        const atividades = await prisma.atividade.findMany({
+            where: { materia_id: Number(materiaId) },
+            include: comMateria
+        });
+        return atividades.map((atividade) => formatarAtividade(atividade));
     }
 
     async listarAtividadePorId(id) {
-        const [atividade] = await pool.query(
-            `
-        SELECT 
-            atividade.id,
-            atividade.titulo,
-            atividade.descricao,
-            atividade.data_entrega,
-            materia.nome AS materia_nome,
-            atividade.materia_id,
-            atividade.criado_em
-        FROM atividade
-        INNER JOIN materia ON materia.id = atividade.materia_id
-        WHERE atividade.id = ?
-        `,
-            [id]
-        );
-
-        return atividade;
+        const atividade = await prisma.atividade.findUnique({
+            where: { id: Number(id) },
+            include: comMateria
+        });
+        return atividade ? [formatarAtividade(atividade, 'materia_nome')] : [];
     }
 
     async adicionarAtividadeMateria(titulo, descricao, data_entrega, materia_id) {
-        const [atividade] = await pool.query(
-            `INSERT INTO atividade (titulo, descricao, data_entrega, materia_id)
-            VALUES (?, ?, ?, ?)`, [titulo, descricao, data_entrega, materia_id]
-        );
-
-        const [resultado] = await pool.query(
-            `SELECT
-                id, titulo, descricao, data_entrega, materia_id, criado_em
-            FROM atividade
-            WHERE id = ?`, [atividade.insertId]
-        );
-
-        return resultado[0];
+        return prisma.atividade.create({
+            data: {
+                titulo,
+                descricao,
+                data_entrega: new Date(data_entrega),
+                materia_id: Number(materia_id)
+            },
+            select: {
+                id: true, titulo: true, descricao: true, data_entrega: true,
+                materia_id: true, criado_em: true
+            }
+        });
     }
 
     async alterarAtividade(id, titulo, descricao, data_entrega, materia_id) {
-
-        const [atividade] = await pool.query(
-            `UPDATE atividade SET
-                titulo = ?, descricao = ?, data_entrega = ?, materia_id = ?
-            WHERE id = ?`, [titulo, descricao, data_entrega, materia_id, id]
-        );
-
-        return atividade;
+        await prisma.atividade.update({
+            where: { id: Number(id) },
+            data: {
+                titulo,
+                descricao,
+                data_entrega: new Date(data_entrega),
+                materia_id: Number(materia_id)
+            }
+        });
+        return { affectedRows: 1 };
     }
 
     async deletarAtividade(atividadeId) {
-        const [resultado] = await pool.query(`
-            DELETE FROM atividade WHERE atividade.id = ?`, [atividadeId]
-        );
-        return resultado
+        const resultado = await prisma.atividade.deleteMany({ where: { id: Number(atividadeId) } });
+        return { affectedRows: resultado.count };
     }
-
 }

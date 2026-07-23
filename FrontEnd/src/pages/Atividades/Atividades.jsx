@@ -37,7 +37,7 @@ function Atividades() {
             <strong>{atividade.titulo}</strong><br />
             {atividade.descricao || "Sem descrição"}<br />
             Matéria: {atividade.nome || "Não informada"}<br />
-            Entrega: {atividade.data_entrega ? new Date(atividade.data_entrega).toLocaleString("pt-BR") : "Não informada"}
+            Entrega: {atividade.data_entrega ? new Date(atividade.data_entrega).toLocaleDateString("pt-BR", { timeZone: "UTC" }) : "Não informada"}
           </li>
         ))}
       </ul>

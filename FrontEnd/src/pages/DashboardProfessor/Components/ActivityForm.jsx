@@ -16,7 +16,7 @@ function ActivityForm({ dados, salvando, onAlterar, onSalvar, onCancelar }) {
         Data de entrega
         <input
           required
-          type="datetime-local"
+          type="date"
           value={dados.data_entrega}
           onChange={(event) =>
             onAlterar({ ...dados, data_entrega: event.target.value })

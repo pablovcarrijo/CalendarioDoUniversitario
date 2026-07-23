@@ -1,93 +1,56 @@
-import pool from '../Config/db.js';
+import prisma from '../Config/db.js';
+
+const dadosPublicos = { id: true, nome: true, email: true, matricula: true, role: true };
+const dadosComSenha = { ...dadosPublicos, senha: true };
 
 export class UserRepository {
-
     async listarUsersByRole(role) {
-
-        if (role) {
-            const [users] = await pool.query(`
-            
-            SELECT
-                id, nome, email, matricula, role
-            FROM usuario
-            WHERE role = ?`, [role]
-            )
-            return users;
+        if (role && !['ALUNO', 'PROFESSOR', 'ADMINISTRADOR'].includes(role)) {
+            return [];
         }
 
-        const [users] = await pool.query(`
-            SELECT
-                id, nome, email, matricula, role
-            FROM usuario`
-        )
-        return users;
+        return prisma.usuario.findMany({
+            where: role ? { role } : undefined,
+            select: dadosPublicos
+        });
     }
 
-    async listarUsers(){
-        const [users] = await pool.query(`
-            SELECT
-                id, nome, email, matricula, role
-            FROM usuario`
-        )
-        return users;
+    async listarUsers() {
+        return prisma.usuario.findMany({ select: dadosPublicos });
     }
 
     async buscarUserByMatricula(matricula) {
-        const [users] = await pool.query(`    
-            SELECT 
-                id, nome, email, matricula, role FROM usuario
-                WHERE matricula = ?`, [matricula]
-        )
-        return users;
+        const user = await prisma.usuario.findUnique({ where: { matricula }, select: dadosPublicos });
+        return user ? [user] : [];
     }
 
     async buscarUserById(id) {
-        const [users] = await pool.query(`    
-            SELECT 
-                id, nome, email, matricula, senha, role FROM usuario
-                WHERE id = ?`, [id]
-        )
-        return users;
+        const user = await prisma.usuario.findUnique({ where: { id: Number(id) }, select: dadosComSenha });
+        return user ? [user] : [];
     }
 
-    async buscarUserByEmail(email){
-        const [users] = await pool.query(
-            `SELECT
-                id, nome, email, matricula, senha, role FROM usuario
-            WHERE email = ?`, [email]
-        )
-        return users;
+    async buscarUserByEmail(email) {
+        const user = await prisma.usuario.findUnique({ where: { email }, select: dadosComSenha });
+        return user ? [user] : [];
     }
 
     async adicionarUser(nome, email, matricula, senha, role) {
-        const [resultado] = await pool.query(`
-            
-            INSERT INTO usuario (nome, email, matricula, senha, role)
-            VALUES (?, ?, ?, ?, ?)`,[nome, email, matricula, senha, role]
-        );
-
-        return {
-            id: resultado.insertId,
-            nome, email, matricula, role
-        } 
+        return prisma.usuario.create({
+            data: { nome, email, matricula, senha, role },
+            select: dadosPublicos
+        });
     }
 
-    async alterarUser(id, nome, email, matricula, senha, role){
-        const [resultado] = await pool.query(`
-            
-            UPDATE usuario SET nome = ?, email = ?, matricula = ?, senha = ?, role = ?
-            WHERE id = ?`, [nome, email, matricula, senha, role, id]
-        );
-        return resultado;
+    async alterarUser(id, nome, email, matricula, senha, role) {
+        await prisma.usuario.update({
+            where: { id: Number(id) },
+            data: { nome, email, matricula, senha, role }
+        });
+        return { affectedRows: 1 };
     }
 
     async deletarUserByMatricula(matricula) {
-        const [resultado] = await pool.query(`
-            
-            DELETE FROM usuario
-            WHERE matricula = ?`, [matricula]
-        )
-        return resultado;
+        const resultado = await prisma.usuario.deleteMany({ where: { matricula } });
+        return { affectedRows: resultado.count };
     }
-
 }
