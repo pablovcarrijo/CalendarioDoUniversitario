@@ -19,10 +19,8 @@ function AppointmentsCard({
       {erro && <p className="error-message">{erro}</p>}
 
       {!carregando && !erro && proximosCompromissos.length === 0 && (
-          <p className="empty-state">
-            Nenhum compromisso próximo.
-          </p>
-        )}
+        <p className="empty-state">Nenhum compromisso próximo.</p>
+      )}
 
       <div className="appointment-list">
         {proximosCompromissos.map((atividade, index) => (
@@ -33,15 +31,11 @@ function AppointmentsCard({
           >
             <div className="appointment-date">
               <strong>
-                {String(
-                  atividade.dataFormatada.getDate(),
-                ).padStart(2, "0")}
+                {String(atividade.dataFormatada.getDate()).padStart(2, "0")}
               </strong>
 
               <span>
-                {nomesMeses[
-                  atividade.dataFormatada.getMonth()
-                ]
+                {nomesMeses[atividade.dataFormatada.getMonth()]
                   .slice(0, 3)
                   .toUpperCase()}
               </span>

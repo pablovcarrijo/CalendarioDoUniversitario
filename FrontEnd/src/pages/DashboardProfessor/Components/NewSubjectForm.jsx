@@ -9,15 +9,37 @@ function NewSubjectForm({ dados, salvando, onAlterar, onSalvar, onCancelar }) {
       <form className="professor-form" onSubmit={onSalvar}>
         <label>
           Nome da matéria
-          <input required value={dados.nome} onChange={(event) => onAlterar({ ...dados, nome: event.target.value })} placeholder="Ex.: Programação Web" />
+          <input
+            required
+            value={dados.nome}
+            onChange={(event) =>
+              onAlterar({ ...dados, nome: event.target.value })
+            }
+            placeholder="Ex.: Programação Web"
+          />
         </label>
         <label>
           Descrição
-          <textarea value={dados.descricao} onChange={(event) => onAlterar({ ...dados, descricao: event.target.value })} placeholder="Descreva o conteúdo da matéria" rows="5" />
+          <textarea
+            value={dados.descricao}
+            onChange={(event) =>
+              onAlterar({ ...dados, descricao: event.target.value })
+            }
+            placeholder="Descreva o conteúdo da matéria"
+            rows="5"
+          />
         </label>
         <div className="form-actions">
-          <button type="button" className="secondary-professor-button" onClick={onCancelar}>Cancelar</button>
-          <button type="submit" disabled={salvando}>{salvando ? "Salvando..." : "Cadastrar matéria"}</button>
+          <button
+            type="button"
+            className="secondary-professor-button"
+            onClick={onCancelar}
+          >
+            Cancelar
+          </button>
+          <button type="submit" disabled={salvando}>
+            {salvando ? "Salvando..." : "Cadastrar matéria"}
+          </button>
         </div>
       </form>
     </section>

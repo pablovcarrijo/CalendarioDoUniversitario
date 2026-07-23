@@ -1,4 +1,10 @@
-function SubjectsCard({ materias, carregando, removendoId, erro, onDesmatricular }) {
+function SubjectsCard({
+  materias,
+  carregando,
+  removendoId,
+  erro,
+  onDesmatricular,
+}) {
   return (
     <section className="dashboard-card side-card">
       <div className="card-heading-row">
@@ -10,16 +16,16 @@ function SubjectsCard({ materias, carregando, removendoId, erro, onDesmatricular
 
       {erro && <p className="error-message">{erro}</p>}
 
-      {carregando ? (<p className="status-text">Carregando matérias...</p>) : materias.length > 0 ? (
+      {carregando ? (
+        <p className="status-text">Carregando matérias...</p>
+      ) : materias.length > 0 ? (
         <div className="subject-list">
           {materias.map((materia, index) => (
             <article
               className="subject-item"
               key={materia.materia_id ?? `${materia.materia_nome}-${index}`}
             >
-              <span
-                className={`subject-icon subject-color-${index % 4}`}
-              >
+              <span className={`subject-icon subject-color-${index % 4}`}>
                 {materia.materia_nome?.charAt(0)?.toUpperCase()}
               </span>
 
@@ -27,8 +33,7 @@ function SubjectsCard({ materias, carregando, removendoId, erro, onDesmatricular
                 <strong>{materia.materia_nome}</strong>
 
                 <small>
-                  {materia.professor_nome ||
-                    "Professor não informado"}
+                  {materia.professor_nome || "Professor não informado"}
                 </small>
               </span>
 

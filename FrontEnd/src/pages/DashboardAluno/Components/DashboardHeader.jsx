@@ -1,9 +1,4 @@
-function DashboardHeader({
-  usuario,
-  menuAberto,
-  onAlternarMenu,
-  onLogout,
-}) {
+function DashboardHeader({ usuario, menuAberto, onAlternarMenu, onLogout }) {
   return (
     <header className="dashboard-header">
       <div className="dashboard-title-area">
@@ -23,11 +18,7 @@ function DashboardHeader({
           <span>Aluno</span>
         </div>
 
-        <button
-          className="logout-button"
-          type="button"
-          onClick={onLogout}
-        >
+        <button className="logout-button" type="button" onClick={onLogout}>
           <span>↪</span>
           Logout
         </button>

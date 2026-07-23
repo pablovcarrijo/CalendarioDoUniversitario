@@ -6,7 +6,9 @@ function ProfessorHeader({ usuario, onLogout }) {
         <h1>Olá, {usuario.nome}</h1>
         <p>Gerencie suas matérias e atividades em um só lugar.</p>
       </div>
-      <button type="button" className="professor-logout" onClick={onLogout}>Sair</button>
+      <button type="button" className="professor-logout" onClick={onLogout}>
+        Sair
+      </button>
     </header>
   );
 }

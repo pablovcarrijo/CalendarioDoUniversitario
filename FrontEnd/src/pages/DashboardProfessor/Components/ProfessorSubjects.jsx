@@ -1,12 +1,28 @@
 import SubjectCard from "./SubjectCard.jsx";
 
-function ProfessorSubjects({ materias, atividadesPorMateria, materiaAberta, formularioAtividade, novaAtividade, salvandoAtividadeId, onCadastrarPrimeira, onAlternarMateria, onAbrirFormulario, onAlterarAtividade, onSalvarAtividade, onCancelarAtividade }) {
+function ProfessorSubjects({
+  materias,
+  atividadesPorMateria,
+  materiaAberta,
+  formularioAtividade,
+  novaAtividade,
+  salvandoAtividadeId,
+  onCadastrarPrimeira,
+  onAlternarMateria,
+  onAbrirFormulario,
+  onAlterarAtividade,
+  onSalvarAtividade,
+  onCancelarAtividade,
+}) {
   if (materias.length === 0) {
     return (
       <section className="professor-empty">
-        <span>📚</span><h2>Nenhuma matéria cadastrada</h2>
+        <span>📚</span>
+        <h2>Nenhuma matéria cadastrada</h2>
         <p>Crie sua primeira matéria para começar a adicionar atividades.</p>
-        <button type="button" onClick={onCadastrarPrimeira}>Cadastrar primeira matéria</button>
+        <button type="button" onClick={onCadastrarPrimeira}>
+          Cadastrar primeira matéria
+        </button>
       </section>
     );
   }
@@ -14,8 +30,14 @@ function ProfessorSubjects({ materias, atividadesPorMateria, materiaAberta, form
   return (
     <section className="professor-subjects">
       <div className="professor-summary">
-        <div><strong>{materias.length}</strong><span>Matérias</span></div>
-        <div><strong>{Object.values(atividadesPorMateria).flat().length}</strong><span>Atividades</span></div>
+        <div>
+          <strong>{materias.length}</strong>
+          <span>Matérias</span>
+        </div>
+        <div>
+          <strong>{Object.values(atividadesPorMateria).flat().length}</strong>
+          <span>Atividades</span>
+        </div>
       </div>
       {materias.map((materia) => (
         <SubjectCard

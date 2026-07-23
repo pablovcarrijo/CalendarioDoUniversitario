@@ -55,6 +55,28 @@ materiasRoutes.post('/', autenticar, autorizarRoles("PROFESSOR", "ADMINISTRADOR"
 
 })
 
+materiasRoutes.post('/:id', autenticar, autorizarRoles("ADMINISTRADOR"), async (req, res) => {
+    try{
+        const {nome, descricao} = req.body;
+        const professor_id = req.params.id;
+
+        if(!nome){
+            return res.status(400).json({ mensagem: "Erro, nome da matéria ou id do professor é obrigatório" });
+        }
+
+        const materiaCriada = await repository.adicionarMateria(nome, descricao, professor_id);
+
+        return res.status(201).json({
+            mensagem: "Matéria criada com sucesso!",
+            materia: materiaCriada
+        })
+    }
+    catch(err){
+        console.log(`Erro ao inserir matéria: ${err}`)
+        return res.status(500).json({ mensagem: "Erro ao inserir matéria!" })
+    }
+})
+
 materiasRoutes.put("/:id", autenticar, autorizarRoles("PROFESSOR", "ADMINISTRADOR"), async (req, res) => {
 
     const materiaAnterior = await repository.listarMateriaById(req.params.id);

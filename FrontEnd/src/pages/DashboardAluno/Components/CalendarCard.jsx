@@ -63,8 +63,7 @@ function CalendarCard({
           </button>
 
           <h2>
-            {nomesMeses[dataExibida.getMonth()]}{" "}
-            {dataExibida.getFullYear()}
+            {nomesMeses[dataExibida.getMonth()]} {dataExibida.getFullYear()}
           </h2>
         </div>
 
@@ -93,8 +92,7 @@ function CalendarCard({
         {diasCalendario.map((dia) => {
           const eventos = atividadesDoDia(dia);
 
-          const pertenceAoMes =
-            dia.getMonth() === dataExibida.getMonth();
+          const pertenceAoMes = dia.getMonth() === dataExibida.getMonth();
 
           const ehHoje = mesmaData(dia, hoje);
 
@@ -116,24 +114,17 @@ function CalendarCard({
                 "pt-BR",
               )}`}
             >
-              <span className="day-number">
-                {dia.getDate()}
-              </span>
+              <span className="day-number">{dia.getDate()}</span>
 
               <span className="day-events">
                 {eventos.slice(0, 2).map((atividade, index) => (
                   <span
                     className="calendar-event-preview"
-                    key={
-                      atividade.id ??
-                      `${atividade.titulo}-${index}`
-                    }
+                    key={atividade.id ?? `${atividade.titulo}-${index}`}
                   >
                     <strong>{atividade.titulo}</strong>
 
-                    <small>
-                      {obterNomeMateria(atividade)}
-                    </small>
+                    <small>{obterNomeMateria(atividade)}</small>
                   </span>
                 ))}
 
@@ -188,18 +179,13 @@ function CalendarCard({
             </header>
 
             {eventosSelecionados.length === 0 ? (
-              <p className="empty-state">
-                Nenhum compromisso nesse dia.
-              </p>
+              <p className="empty-state">Nenhum compromisso nesse dia.</p>
             ) : (
               <div className="day-modal-events">
                 {eventosSelecionados.map((atividade, index) => (
                   <article
                     className="day-modal-event"
-                    key={
-                      atividade.id ??
-                      `${atividade.titulo}-${index}`
-                    }
+                    key={atividade.id ?? `${atividade.titulo}-${index}`}
                   >
                     <span className="event-subject">
                       {obterNomeMateria(atividade)}
@@ -212,9 +198,7 @@ function CalendarCard({
                         "Essa atividade não possui descrição."}
                     </p>
 
-                    {atividade.tipo && (
-                      <small>Tipo: {atividade.tipo}</small>
-                    )}
+                    {atividade.tipo && <small>Tipo: {atividade.tipo}</small>}
                   </article>
                 ))}
               </div>

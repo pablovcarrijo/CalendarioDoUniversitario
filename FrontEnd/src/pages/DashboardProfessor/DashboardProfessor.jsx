@@ -11,7 +11,11 @@ import "./dashboardProfessor.css";
 function extrairLista(resposta) {
   if (Array.isArray(resposta)) return resposta;
   if (!resposta || typeof resposta !== "object") return [];
-  return [resposta.resultado, resposta.materias, resposta.data].find(Array.isArray) || [];
+  return (
+    [resposta.resultado, resposta.materias, resposta.data].find(
+      Array.isArray,
+    ) || []
+  );
 }
 
 function DashboardProfessor() {
@@ -27,7 +31,11 @@ function DashboardProfessor() {
   const [salvandoMateria, setSalvandoMateria] = useState(false);
   const [salvandoAtividadeId, setSalvandoAtividadeId] = useState(null);
   const [novaMateria, setNovaMateria] = useState({ nome: "", descricao: "" });
-  const [novaAtividade, setNovaAtividade] = useState({ titulo: "", descricao: "", data_entrega: "" });
+  const [novaAtividade, setNovaAtividade] = useState({
+    titulo: "",
+    descricao: "",
+    data_entrega: "",
+  });
 
   const carregarDados = useCallback(async (professor) => {
     setCarregando(true);
@@ -58,7 +66,9 @@ function DashboardProfessor() {
       try {
         const resposta = await apiFetch("/login/me");
         const professor = resposta?.usuario;
-        const role = String(professor?.role || "").trim().toUpperCase();
+        const role = String(professor?.role || "")
+          .trim()
+          .toUpperCase();
         if (!professor || role !== "PROFESSOR") {
           navigate(role === "ALUNO" ? "/aluno" : "/", { replace: true });
           return;
@@ -72,7 +82,9 @@ function DashboardProfessor() {
       }
     }
     iniciar();
-    return () => { ativo = false; };
+    return () => {
+      ativo = false;
+    };
   }, [carregarDados, navigate]);
 
   async function sair() {
@@ -88,7 +100,10 @@ function DashboardProfessor() {
     setSalvandoMateria(true);
     setErro("");
     try {
-      await apiFetch("/materias", { method: "POST", body: JSON.stringify(novaMateria) });
+      await apiFetch("/materias", {
+        method: "POST",
+        body: JSON.stringify(novaMateria),
+      });
       setNovaMateria({ nome: "", descricao: "" });
       await carregarDados(usuario);
       setAbaAtiva("materias");
@@ -101,7 +116,7 @@ function DashboardProfessor() {
 
   function abrirFormularioAtividade(materiaId) {
     setMateriaAberta(materiaId);
-    setFormularioAtividade((atual) => atual === materiaId ? null : materiaId);
+    setFormularioAtividade((atual) => (atual === materiaId ? null : materiaId));
     setNovaAtividade({ titulo: "", descricao: "", data_entrega: "" });
     setErro("");
   }
@@ -116,7 +131,10 @@ function DashboardProfessor() {
         body: JSON.stringify({ ...novaAtividade, materia_id: materiaId }),
       });
       const resposta = await apiFetch(`/atividades?materia=${materiaId}`);
-      setAtividadesPorMateria((atuais) => ({ ...atuais, [materiaId]: extrairLista(resposta) }));
+      setAtividadesPorMateria((atuais) => ({
+        ...atuais,
+        [materiaId]: extrairLista(resposta),
+      }));
       setNovaAtividade({ titulo: "", descricao: "", data_entrega: "" });
       setFormularioAtividade(null);
     } catch (error) {
@@ -127,7 +145,11 @@ function DashboardProfessor() {
   }
 
   if (!usuario) {
-    return <main className="professor-page"><p className="professor-loading">Verificando autenticação...</p></main>;
+    return (
+      <main className="professor-page">
+        <p className="professor-loading">Verificando autenticação...</p>
+      </main>
+    );
   }
 
   return (
@@ -137,7 +159,13 @@ function DashboardProfessor() {
         <ProfessorTabs abaAtiva={abaAtiva} onMudarAba={setAbaAtiva} />
         {erro && <p className="professor-error">{erro}</p>}
         {abaAtiva === "nova" ? (
-          <NewSubjectForm dados={novaMateria} salvando={salvandoMateria} onAlterar={setNovaMateria} onSalvar={cadastrarMateria} onCancelar={() => setAbaAtiva("materias")} />
+          <NewSubjectForm
+            dados={novaMateria}
+            salvando={salvandoMateria}
+            onAlterar={setNovaMateria}
+            onSalvar={cadastrarMateria}
+            onCancelar={() => setAbaAtiva("materias")}
+          />
         ) : carregando ? (
           <p className="professor-loading">Carregando suas matérias...</p>
         ) : (
@@ -149,7 +177,9 @@ function DashboardProfessor() {
             novaAtividade={novaAtividade}
             salvandoAtividadeId={salvandoAtividadeId}
             onCadastrarPrimeira={() => setAbaAtiva("nova")}
-            onAlternarMateria={(id) => setMateriaAberta((atual) => atual === id ? null : id)}
+            onAlternarMateria={(id) =>
+              setMateriaAberta((atual) => (atual === id ? null : id))
+            }
             onAbrirFormulario={abrirFormularioAtividade}
             onAlterarAtividade={setNovaAtividade}
             onSalvarAtividade={cadastrarAtividade}

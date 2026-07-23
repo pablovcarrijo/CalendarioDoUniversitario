@@ -412,7 +412,9 @@ function DashboardAluno() {
         ),
       );
     } catch (error) {
-      setErroMatricula(error.message || "Não foi possível carregar as matérias.");
+      setErroMatricula(
+        error.message || "Não foi possível carregar as matérias.",
+      );
     } finally {
       setCarregandoDisponiveis(false);
     }
@@ -432,7 +434,7 @@ function DashboardAluno() {
         apiFetch("/aluno_materia/minhas"),
         apiFetch("/atividades"),
       ]);
-      
+
       setMaterias(extrairLista(respostaAtualizada));
       setAtividades(extrairLista(atividadesAtualizadas));
       setMateriasDisponiveis((atuais) =>
