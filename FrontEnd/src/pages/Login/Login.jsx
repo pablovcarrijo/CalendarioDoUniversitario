@@ -50,6 +50,11 @@ function Login() {
         return;
       }
 
+      if (role === "ADMINISTRADOR") {
+        navigate("/administrador", { replace: true });
+        return;
+      }
+
       throw new Error(`Role não reconhecida: ${role}`);
     } catch (error) {
       console.error(error);
