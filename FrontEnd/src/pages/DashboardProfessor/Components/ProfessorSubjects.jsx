@@ -9,6 +9,11 @@ function ProfessorSubjects({
   salvandoAtividadeId,
   excluindoAtividadeId,
   excluindoMateriaId,
+  editandoMateriaId,
+  editandoAtividadeId,
+  salvandoEdicaoId,
+  edicaoMateria,
+  edicaoAtividade,
   onCadastrarPrimeira,
   onAlternarMateria,
   onAbrirFormulario,
@@ -17,6 +22,14 @@ function ProfessorSubjects({
   onCancelarAtividade,
   onExcluirAtividade,
   onExcluirMateria,
+  onIniciarEdicaoMateria,
+  onAlterarEdicaoMateria,
+  onSalvarEdicaoMateria,
+  onCancelarEdicaoMateria,
+  onIniciarEdicaoAtividade,
+  onAlterarEdicaoAtividade,
+  onSalvarEdicaoAtividade,
+  onCancelarEdicaoAtividade,
 }) {
   if (materias.length === 0) {
     return (
@@ -54,6 +67,11 @@ function ProfessorSubjects({
           salvando={salvandoAtividadeId === materia.id}
           excluindoAtividadeId={excluindoAtividadeId}
           excluindoMateria={excluindoMateriaId === materia.id}
+          editandoMateria={editandoMateriaId === materia.id}
+          editandoAtividadeId={editandoAtividadeId}
+          salvandoEdicaoId={salvandoEdicaoId}
+          edicaoMateria={edicaoMateria}
+          edicaoAtividade={edicaoAtividade}
           onAlternar={() => onAlternarMateria(materia.id)}
           onAbrirFormulario={() => onAbrirFormulario(materia.id)}
           onAlterarAtividade={onAlterarAtividade}
@@ -63,6 +81,16 @@ function ProfessorSubjects({
             onExcluirAtividade(atividade, materia.id)
           }
           onExcluirMateria={() => onExcluirMateria(materia)}
+          onIniciarEdicaoMateria={() => onIniciarEdicaoMateria(materia)}
+          onAlterarEdicaoMateria={onAlterarEdicaoMateria}
+          onSalvarEdicaoMateria={(event) => onSalvarEdicaoMateria(event, materia.id)}
+          onCancelarEdicaoMateria={onCancelarEdicaoMateria}
+          onIniciarEdicaoAtividade={onIniciarEdicaoAtividade}
+          onAlterarEdicaoAtividade={onAlterarEdicaoAtividade}
+          onSalvarEdicaoAtividade={(event, atividade) =>
+            onSalvarEdicaoAtividade(event, atividade, materia.id)
+          }
+          onCancelarEdicaoAtividade={onCancelarEdicaoAtividade}
         />
       ))}
     </section>

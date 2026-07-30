@@ -313,6 +313,33 @@ td {
     background: #d63851;
 }
 
+.admin-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-edit {
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 7px;
+    color: #563bc0;
+    background: #eeeaff;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.admin-edit:hover {
+    color: #fff;
+    background: #6547ce;
+}
+
+.admin-inline-edit {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 4px;
+}
+
 .admin-card-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -441,7 +468,7 @@ button:disabled {
         grid-template-columns: 38px 1fr;
     }
 
-    .admin-data-card .admin-delete {
+    .admin-data-card .admin-card-actions {
         grid-column: 2;
     }
 }

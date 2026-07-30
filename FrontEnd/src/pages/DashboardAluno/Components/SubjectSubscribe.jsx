@@ -2,8 +2,7 @@ function QuickActionsCard({ onAbrirMatriculas }) {
   return (
     <section className="dashboard-card side-card">
       <h2>
-        <span>⚡</span>
-        Ações rápidas
+        Cadastre-se em uma matéria
       </h2>
 
       <div className="quick-actions">

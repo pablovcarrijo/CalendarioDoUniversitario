@@ -23,8 +23,7 @@ function AppointmentsCard({
 
       <div className="appointment-list">
         {proximosCompromissos.map((atividade, index) => (
-          <Link
-            to="/atividades"
+          <div
             className="appointment-item"
             key={atividade.id ?? `${atividade.titulo}-${index}`}
           >
@@ -49,7 +48,7 @@ function AppointmentsCard({
                 {atividade.nome || "Atividade"}
               </span>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </section>

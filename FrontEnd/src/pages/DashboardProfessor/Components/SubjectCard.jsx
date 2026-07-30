@@ -21,6 +21,11 @@ function SubjectCard({
   salvando,
   excluindoAtividadeId,
   excluindoMateria,
+  editandoMateria,
+  editandoAtividadeId,
+  salvandoEdicaoId,
+  edicaoMateria,
+  edicaoAtividade,
   onAlternar,
   onAbrirFormulario,
   onAlterarAtividade,
@@ -28,6 +33,14 @@ function SubjectCard({
   onCancelarAtividade,
   onExcluirAtividade,
   onExcluirMateria,
+  onIniciarEdicaoMateria,
+  onAlterarEdicaoMateria,
+  onSalvarEdicaoMateria,
+  onCancelarEdicaoMateria,
+  onIniciarEdicaoAtividade,
+  onAlterarEdicaoAtividade,
+  onSalvarEdicaoAtividade,
+  onCancelarEdicaoAtividade,
 }) {
   return (
     <article className="professor-subject-card">
@@ -45,29 +58,64 @@ function SubjectCard({
           <small>{materia.descricao || "Sem descrição"}</small>
         </span>
         <span className="activity-count">
-          {atividades.length}{" "}
-          {atividades.length === 1 ? "atividade" : "atividades"}
+          {atividades.length} {atividades.length === 1 ? "atividade" : "atividades"}
         </span>
-        <span className="expand-icon">{aberta ? "⌃" : "⌄"}</span>
+        <span className="expand-icon">{aberta ? "⬆️" : "⬇️"}</span>
       </button>
-      <button
-        type="button"
-        className="delete-subject-button"
-        onClick={onExcluirMateria}
-        disabled={excluindoMateria}
-        aria-label={`Excluir matéria ${materia.nome}`}
-        title="Excluir matéria"
-      >
-        {excluindoMateria ? "…" : "×"}
-      </button>
+      <div className="subject-card-actions">
+        <button type="button" className="edit-subject-button" onClick={onIniciarEdicaoMateria}>
+          Editar
+        </button>
+        <button
+          type="button"
+          className="delete-subject-button"
+          onClick={onExcluirMateria}
+          disabled={excluindoMateria}
+          aria-label={`Excluir matéria ${materia.nome}`}
+          title="Excluir matéria"
+        >
+          {excluindoMateria ? "…" : "×"}
+        </button>
+      </div>
+
+      {editandoMateria && (
+        <form className="activity-form subject-edit-form" onSubmit={onSalvarEdicaoMateria}>
+          <label>
+            Nome da matéria
+            <input
+              required
+              value={edicaoMateria.nome}
+              onChange={(event) =>
+                onAlterarEdicaoMateria({ ...edicaoMateria, nome: event.target.value })
+              }
+            />
+          </label>
+          <label className="full-field">
+            Descrição
+            <textarea
+              rows="3"
+              value={edicaoMateria.descricao}
+              onChange={(event) =>
+                onAlterarEdicaoMateria({ ...edicaoMateria, descricao: event.target.value })
+              }
+            />
+          </label>
+          <div className="activity-form-actions full-field">
+            <button type="button" className="secondary-professor-button" onClick={onCancelarEdicaoMateria}>
+              Cancelar
+            </button>
+            <button type="submit" disabled={salvandoEdicaoId === `materia-${materia.id}`}>
+              {salvandoEdicaoId === `materia-${materia.id}` ? "Salvando..." : "Salvar alterações"}
+            </button>
+          </div>
+        </form>
+      )}
 
       {aberta && (
         <div className="subject-card-content">
           <div className="activity-heading">
             <h3>Atividades</h3>
-            <button type="button" onClick={onAbrirFormulario}>
-              ＋ Cadastrar atividade
-            </button>
+            <button type="button" onClick={onAbrirFormulario}>＋ Cadastrar atividade</button>
           </div>
           {formularioAberto && (
             <ActivityForm
@@ -79,9 +127,7 @@ function SubjectCard({
             />
           )}
           {atividades.length === 0 ? (
-            <p className="no-activities">
-              Nenhuma atividade cadastrada nesta matéria.
-            </p>
+            <p className="no-activities">Nenhuma atividade cadastrada nesta matéria.</p>
           ) : (
             <div className="professor-activity-list">
               {atividades.map((atividade) => (
@@ -92,16 +138,36 @@ function SubjectCard({
                     <p>{atividade.descricao || "Sem descrição"}</p>
                   </div>
                   <time>{formatarData(atividade.data_entrega)}</time>
-                  <button
-                    type="button"
-                    className="delete-activity-button"
-                    onClick={() => onExcluirAtividade(atividade)}
-                    disabled={excluindoAtividadeId === atividade.id}
-                    aria-label={`Excluir atividade ${atividade.titulo}`}
-                    title="Excluir atividade"
-                  >
-                    {excluindoAtividadeId === atividade.id ? "…" : "×"}
-                  </button>
+                  <div className="professor-activity-actions">
+                    <button
+                      type="button"
+                      className="edit-activity-button"
+                      onClick={() => onIniciarEdicaoAtividade(atividade)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="delete-activity-button"
+                      onClick={() => onExcluirAtividade(atividade)}
+                      disabled={excluindoAtividadeId === atividade.id}
+                      aria-label={`Excluir atividade ${atividade.titulo}`}
+                      title="Excluir atividade"
+                    >
+                      {excluindoAtividadeId === atividade.id ? "…" : "×"}
+                    </button>
+                  </div>
+                  {editandoAtividadeId === atividade.id && (
+                    <div className="activity-edit-row">
+                      <ActivityForm
+                        dados={edicaoAtividade}
+                        salvando={salvandoEdicaoId === `atividade-${atividade.id}`}
+                        onAlterar={onAlterarEdicaoAtividade}
+                        onSalvar={(event) => onSalvarEdicaoAtividade(event, atividade)}
+                        onCancelar={onCancelarEdicaoAtividade}
+                      />
+                    </div>
+                  )}
                 </article>
               ))}
             </div>

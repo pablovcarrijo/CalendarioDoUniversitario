@@ -1,4 +1,4 @@
-import QuickActionsCard from "./QuickActionsCard.jsx";
+import QuickActionsCard from "./SubjectSubscribe.jsx";
 import SubjectsCard from "./SubjectsCard.jsx";
 import AppointmentsCard from "./AppointmentsCard.jsx";
 

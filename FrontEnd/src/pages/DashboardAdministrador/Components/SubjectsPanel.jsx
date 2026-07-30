@@ -4,6 +4,7 @@ function SubjectsPanel({
   professores,
   salvando,
   onCriar,
+  onAtualizar,
   onExcluir,
 }) {
   const [busca, setBusca] = useState("");
@@ -13,6 +14,8 @@ function SubjectsPanel({
     descricao: "",
     professor_id: "",
   });
+  const [editandoId, setEditandoId] = useState(null);
+  const [edicao, setEdicao] = useState({ nome: "", descricao: "" });
   const filtradas = useMemo(
     () =>
       materias.filter((m) =>
@@ -29,6 +32,14 @@ function SubjectsPanel({
       setForm({ nome: "", descricao: "", professor_id: "" });
       setFormAberto(false);
     }
+  }
+  function editar(materia) {
+    setEditandoId(materia.id);
+    setEdicao({ nome: materia.nome || "", descricao: materia.descricao || "" });
+  }
+  async function salvarEdicao(event) {
+    event.preventDefault();
+    if (await onAtualizar(editandoId, edicao)) setEditandoId(null);
   }
   return (
     <section className="admin-panel">
@@ -108,13 +119,38 @@ function SubjectsPanel({
               <p>{m.descricao || "Sem descrição"}</p>
               <small>Responsável: {m.professor_nome || "Não informado"}</small>
             </div>
-            <button
-              type="button"
-              className="admin-delete"
-              onClick={() => onExcluir(m)}
-            >
-              Excluir
-            </button>
+            <div className="admin-card-actions">
+              <button type="button" className="admin-edit" onClick={() => editar(m)}>
+                Editar
+              </button>
+              <button type="button" className="admin-delete" onClick={() => onExcluir(m)}>
+                Excluir
+              </button>
+            </div>
+            {editandoId === m.id && (
+              <form className="admin-form admin-inline-edit" onSubmit={salvarEdicao}>
+                <input
+                  required
+                  value={edicao.nome}
+                  onChange={(e) => setEdicao({ ...edicao, nome: e.target.value })}
+                  placeholder="Nome da matéria"
+                />
+                <textarea
+                  rows="3"
+                  value={edicao.descricao}
+                  onChange={(e) => setEdicao({ ...edicao, descricao: e.target.value })}
+                  placeholder="Descrição"
+                />
+                <div className="admin-form-actions">
+                  <button type="button" className="admin-secondary" onClick={() => setEditandoId(null)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" disabled={salvando}>
+                    {salvando ? "Salvando..." : "Salvar alterações"}
+                  </button>
+                </div>
+              </form>
+            )}
           </article>
         ))}
       </div>

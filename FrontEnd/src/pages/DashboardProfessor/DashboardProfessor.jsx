@@ -32,6 +32,15 @@ function DashboardProfessor() {
   const [salvandoAtividadeId, setSalvandoAtividadeId] = useState(null);
   const [excluindoAtividadeId, setExcluindoAtividadeId] = useState(null);
   const [excluindoMateriaId, setExcluindoMateriaId] = useState(null);
+  const [editandoMateriaId, setEditandoMateriaId] = useState(null);
+  const [editandoAtividadeId, setEditandoAtividadeId] = useState(null);
+  const [salvandoEdicaoId, setSalvandoEdicaoId] = useState(null);
+  const [edicaoMateria, setEdicaoMateria] = useState({ nome: "", descricao: "" });
+  const [edicaoAtividade, setEdicaoAtividade] = useState({
+    titulo: "",
+    descricao: "",
+    data_entrega: "",
+  });
   const [novaMateria, setNovaMateria] = useState({ nome: "", descricao: "" });
   const [novaAtividade, setNovaAtividade] = useState({
     titulo: "",
@@ -206,6 +215,62 @@ function DashboardProfessor() {
     }
   }
 
+  function iniciarEdicaoMateria(materia) {
+    setEditandoMateriaId(materia.id);
+    setEdicaoMateria({ nome: materia.nome || "", descricao: materia.descricao || "" });
+    setErro("");
+  }
+
+  async function atualizarMateria(event, materiaId) {
+    event.preventDefault();
+    setSalvandoEdicaoId(`materia-${materiaId}`);
+    setErro("");
+    try {
+      await apiFetch(`/materias/${materiaId}`, {
+        method: "PUT",
+        body: JSON.stringify(edicaoMateria),
+      });
+      await carregarDados(usuario);
+      setEditandoMateriaId(null);
+    } catch (error) {
+      setErro(error.message || "Não foi possível atualizar a matéria.");
+    } finally {
+      setSalvandoEdicaoId(null);
+    }
+  }
+
+  function iniciarEdicaoAtividade(atividade) {
+    setEditandoAtividadeId(atividade.id);
+    setEdicaoAtividade({
+      titulo: atividade.titulo || "",
+      descricao: atividade.descricao || "",
+      data_entrega: String(atividade.data_entrega || "").slice(0, 10),
+    });
+    setErro("");
+  }
+
+  async function atualizarAtividade(event, atividade, materiaId) {
+    event.preventDefault();
+    setSalvandoEdicaoId(`atividade-${atividade.id}`);
+    setErro("");
+    try {
+      await apiFetch(`/atividades/${atividade.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ ...edicaoAtividade, materia_id: materiaId }),
+      });
+      const resposta = await apiFetch(`/atividades?materia=${materiaId}`);
+      setAtividadesPorMateria((atuais) => ({
+        ...atuais,
+        [materiaId]: extrairLista(resposta),
+      }));
+      setEditandoAtividadeId(null);
+    } catch (error) {
+      setErro(error.message || "Não foi possível atualizar a atividade.");
+    } finally {
+      setSalvandoEdicaoId(null);
+    }
+  }
+
   if (!usuario) {
     return (
       <main className="professor-page">
@@ -240,6 +305,11 @@ function DashboardProfessor() {
             salvandoAtividadeId={salvandoAtividadeId}
             excluindoAtividadeId={excluindoAtividadeId}
             excluindoMateriaId={excluindoMateriaId}
+            editandoMateriaId={editandoMateriaId}
+            editandoAtividadeId={editandoAtividadeId}
+            salvandoEdicaoId={salvandoEdicaoId}
+            edicaoMateria={edicaoMateria}
+            edicaoAtividade={edicaoAtividade}
             onCadastrarPrimeira={() => setAbaAtiva("nova")}
             onAlternarMateria={(id) =>
               setMateriaAberta((atual) => (atual === id ? null : id))
@@ -250,6 +320,14 @@ function DashboardProfessor() {
             onCancelarAtividade={() => setFormularioAtividade(null)}
             onExcluirAtividade={excluirAtividade}
             onExcluirMateria={excluirMateria}
+            onIniciarEdicaoMateria={iniciarEdicaoMateria}
+            onAlterarEdicaoMateria={setEdicaoMateria}
+            onSalvarEdicaoMateria={atualizarMateria}
+            onCancelarEdicaoMateria={() => setEditandoMateriaId(null)}
+            onIniciarEdicaoAtividade={iniciarEdicaoAtividade}
+            onAlterarEdicaoAtividade={setEdicaoAtividade}
+            onSalvarEdicaoAtividade={atualizarAtividade}
+            onCancelarEdicaoAtividade={() => setEditandoAtividadeId(null)}
           />
         )}
       </section>

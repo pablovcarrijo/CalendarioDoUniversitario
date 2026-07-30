@@ -4,12 +4,20 @@ function ActivitiesPanel({
   materias,
   salvando,
   onCriar,
+  onAtualizar,
   onExcluir,
 }) {
   const [busca, setBusca] = useState("");
   const [materiaFiltro, setMateriaFiltro] = useState("TODAS");
   const [formAberto, setFormAberto] = useState(false);
   const [form, setForm] = useState({
+    titulo: "",
+    descricao: "",
+    data_entrega: "",
+    materia_id: "",
+  });
+  const [editandoId, setEditandoId] = useState(null);
+  const [edicao, setEdicao] = useState({
     titulo: "",
     descricao: "",
     data_entrega: "",
@@ -37,6 +45,23 @@ function ActivitiesPanel({
       setForm({ titulo: "", descricao: "", data_entrega: "", materia_id: "" });
       setFormAberto(false);
     }
+  }
+  function editar(atividade) {
+    setEditandoId(atividade.id);
+    setEdicao({
+      titulo: atividade.titulo || "",
+      descricao: atividade.descricao || "",
+      data_entrega: String(atividade.data_entrega || "").slice(0, 10),
+      materia_id: String(atividade.materia_id || ""),
+    });
+  }
+  async function salvarEdicao(event) {
+    event.preventDefault();
+    const sucesso = await onAtualizar(editandoId, {
+      ...edicao,
+      materia_id: Number(edicao.materia_id),
+    });
+    if (sucesso) setEditandoId(null);
   }
   return (
     <section className="admin-panel">
@@ -128,13 +153,53 @@ function ActivitiesPanel({
                 })}
               </small>
             </div>
-            <button
-              type="button"
-              className="admin-delete"
-              onClick={() => onExcluir(a)}
-            >
-              Excluir
-            </button>
+            <div className="admin-card-actions">
+              <button type="button" className="admin-edit" onClick={() => editar(a)}>
+                Editar
+              </button>
+              <button type="button" className="admin-delete" onClick={() => onExcluir(a)}>
+                Excluir
+              </button>
+            </div>
+            {editandoId === a.id && (
+              <form className="admin-form admin-activity-form admin-inline-edit" onSubmit={salvarEdicao}>
+                <input
+                  required
+                  value={edicao.titulo}
+                  onChange={(e) => setEdicao({ ...edicao, titulo: e.target.value })}
+                  placeholder="Título"
+                />
+                <select
+                  required
+                  value={edicao.materia_id}
+                  onChange={(e) => setEdicao({ ...edicao, materia_id: e.target.value })}
+                >
+                  {materias.map((materia) => (
+                    <option key={materia.id} value={materia.id}>{materia.nome}</option>
+                  ))}
+                </select>
+                <input
+                  required
+                  type="date"
+                  value={edicao.data_entrega}
+                  onChange={(e) => setEdicao({ ...edicao, data_entrega: e.target.value })}
+                />
+                <textarea
+                  rows="3"
+                  value={edicao.descricao}
+                  onChange={(e) => setEdicao({ ...edicao, descricao: e.target.value })}
+                  placeholder="Descrição"
+                />
+                <div className="admin-form-actions">
+                  <button type="button" className="admin-secondary" onClick={() => setEditandoId(null)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" disabled={salvando}>
+                    {salvando ? "Salvando..." : "Salvar alterações"}
+                  </button>
+                </div>
+              </form>
+            )}
           </article>
         ))}
       </div>

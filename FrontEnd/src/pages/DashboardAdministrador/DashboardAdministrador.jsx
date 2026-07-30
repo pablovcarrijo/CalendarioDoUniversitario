@@ -162,6 +162,24 @@ function DashboardAdministrador() {
     }
   }
 
+  async function atualizarMateria(id, dados) {
+    iniciarOperacao();
+    try {
+      await apiFetch(`/materias/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(dados),
+      });
+      await carregarDados();
+      setSucesso("Matéria atualizada com sucesso.");
+      return true;
+    } catch (error) {
+      setErro(error.message);
+      return false;
+    } finally {
+      finalizarOperacao();
+    }
+  }
+
   async function criarAtividade(dados) {
     iniciarOperacao();
     try {
@@ -189,6 +207,24 @@ function DashboardAdministrador() {
       setSucesso("Atividade excluída com sucesso.");
     } catch (error) {
       setErro(error.message);
+    } finally {
+      finalizarOperacao();
+    }
+  }
+
+  async function atualizarAtividade(id, dados) {
+    iniciarOperacao();
+    try {
+      await apiFetch(`/atividades/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(dados),
+      });
+      await carregarDados();
+      setSucesso("Atividade atualizada com sucesso.");
+      return true;
+    } catch (error) {
+      setErro(error.message);
+      return false;
     } finally {
       finalizarOperacao();
     }
@@ -245,6 +281,7 @@ function DashboardAdministrador() {
             professores={usuarios.filter((user) => user.role === "PROFESSOR")}
             salvando={salvando}
             onCriar={criarMateria}
+            onAtualizar={atualizarMateria}
             onExcluir={excluirMateria}
           />
         )}
@@ -254,6 +291,7 @@ function DashboardAdministrador() {
             materias={materias}
             salvando={salvando}
             onCriar={criarAtividade}
+            onAtualizar={atualizarAtividade}
             onExcluir={excluirAtividade}
           />
         )}
